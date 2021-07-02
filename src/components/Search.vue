@@ -21,11 +21,7 @@
 
     <h3 style="text-align: left; padding-left: 15px">Gene filter</h3>
     <el-select v-model="gene_filter" clearable>
-      <el-option
-        label="genomic region"
-        value="genomic region"
-        :disabled="true"
-      ></el-option>
+      <el-option label="genomic region" value="genomic region"></el-option>
       <el-option label="Ensembl gene ID" value="Ensembl gene ID"></el-option>
       <el-option
         label="gene name"
@@ -171,7 +167,7 @@ const getRegion = (value) => {
   ) {
     let start = parseInt(region[1]);
     let end = parseInt(region[2]);
-    if (start < end) {
+    if (start >= 0 && start < end) {
       return { chromosome: region[0], start: start, end: end };
     }
   }
