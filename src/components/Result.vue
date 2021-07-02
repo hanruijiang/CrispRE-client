@@ -88,6 +88,36 @@
     </el-table-column>
 
     <el-table-column
+      label="gene region"
+      v-if="columns.includes('gene region')"
+      align="center"
+      width="240px"
+    >
+      <template #default="scope">
+        {{
+          scope.row.gene.chromosome +
+          ":" +
+          scope.row.gene.start +
+          "-" +
+          scope.row.gene.end
+        }}</template
+      >
+    </el-table-column>
+
+    <el-table-column
+      label="strand"
+      v-if="columns.includes('gene strand')"
+      align="center"
+      width="60px"
+    >
+      <template #default="scope">
+        {{
+          scope.row.gene.strand
+        }}</template
+      >
+    </el-table-column>
+
+    <el-table-column
       label="target region"
       v-if="columns.includes('target region')"
       align="center"

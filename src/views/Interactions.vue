@@ -125,7 +125,7 @@ export default {
             "phenotype",
           ],
         },
-        { label: "gene", options: ["gene", "Ensembl gene ID"] },
+        { label: "gene", options: ["gene", "Ensembl gene ID", "gene region", "gene strand"] },
         { label: "target", options: ["target region"] },
         {
           label: "interaction",

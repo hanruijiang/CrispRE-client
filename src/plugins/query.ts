@@ -19,18 +19,19 @@ const parseInteraction = (interaction) => {
       chromosome: interaction[3],
       start: interaction[4],
       end: interaction[5],
+      strand: interaction[6],
     },
     target: {
-      TID: interaction[6],
-      chromosome: interaction[7],
-      start: interaction[8],
-      end: interaction[9],
+      TID: interaction[7],
+      chromosome: interaction[8],
+      start: interaction[9],
+      end: interaction[10],
     },
-    distance: interaction[10],
-    fraction_change: interaction[11],
-    p_value: interaction[12],
-    q_value: interaction[13],
-    significant: interaction[14],
+    distance: interaction[11],
+    fraction_change: interaction[12],
+    p_value: interaction[13],
+    q_value: interaction[14],
+    significant: interaction[15],
   };
 };
 
