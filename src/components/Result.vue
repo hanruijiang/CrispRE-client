@@ -110,11 +110,7 @@
       align="center"
       width="60px"
     >
-      <template #default="scope">
-        {{
-          scope.row.gene.strand
-        }}</template
-      >
+      <template #default="scope"> {{ scope.row.gene.strand }}</template>
     </el-table-column>
 
     <el-table-column

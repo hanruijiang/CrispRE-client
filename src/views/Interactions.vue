@@ -5,70 +5,69 @@
     </el-aside>
 
     <el-main>
-      <h2 v-show="total > 0" style="text-align: left; padding-left: 0px">
-        Browsing
-        <span style="color: #409eff">
-          {{ total }}
-        </span>
-        interactions from
-        <span style="color: #409eff">
-          {{ total_experiments }}
-        </span>
-        experiments
-
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="download all results in .csv.gz format. will available after published."
-          placement="top-start"
-          style="float: right; margin: 0 5px"
-        >
-          <el-button plain type="primary" size="small">.gz</el-button>
-        </el-tooltip>
-
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="download current page in .csv format. will available after published."
-          placement="top-start"
-          style="float: right; margin: 0 5px"
-        >
-          <el-button plain type="primary" size="small">.csv</el-button>
-        </el-tooltip>
-
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="select columns"
-          placement="top-start"
-          style="float: right; margin: 0 20px"
-        >
-          <el-select
-            v-model="columns"
-            class="column_selector"
-            multiple
-            style="width: 50px"
-            size="small"
+      <div style="width: 100%; display: flex; justify-content: space-between">
+        <el-space>
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="select columns"
+            placement="top-start"
           >
-            <template #prefix
-              ><i style="font-size=20px" class="el-icon-s-operation"></i
-            ></template>
-
-            <el-option-group
-              v-for="group in result_columns"
-              :key="group.label"
-              :label="group.label"
+            <el-select
+              v-model="columns"
+              class="column_selector"
+              multiple
+              style="width: 50px; margin-right: 12px"
+              size="small"
             >
-              <el-option
-                v-for="item in group.options"
-                :key="item"
-                :label="item"
-                :value="item"
-              ></el-option>
-            </el-option-group>
-          </el-select>
-        </el-tooltip>
-      </h2>
+              <template #prefix
+                ><i style="font-size=20px" class="el-icon-s-operation"></i
+              ></template>
+
+              <el-option-group
+                v-for="group in result_columns"
+                :key="group.label"
+                :label="group.label"
+              >
+                <el-option
+                  v-for="item in group.options"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                ></el-option>
+              </el-option-group>
+            </el-select>
+          </el-tooltip>
+
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="download current page in .csv format. will available after published."
+            placement="top-start"
+          >
+            <el-button plain type="primary" size="small">.csv</el-button>
+          </el-tooltip>
+
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="download all results in .csv.gz format. will available after published."
+            placement="top-start"
+          >
+            <el-button plain type="primary" size="small">.gz</el-button>
+          </el-tooltip>
+        </el-space>
+
+        <el-pagination
+          v-show="total > 0"
+          @current-change="changePage"
+          v-model:currentPage="page"
+          :page-size="page_size"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+        >
+        </el-pagination>
+      </div>
 
       <Result
         v-show="total > 0"
@@ -77,16 +76,6 @@
         :columns="columns"
         :interactions="interactions"
       ></Result>
-
-      <el-pagination
-        v-show="total > 0"
-        @current-change="changePage"
-        v-model:currentPage="page"
-        :page-size="page_size"
-        layout="prev, pager, next, jumper"
-        :total="total"
-      >
-      </el-pagination>
 
       <h2 v-show="total == 0">
         No interactions were found, please try other options
@@ -102,7 +91,7 @@ import Search from "@/components/Search.vue";
 import Result from "@/components/Result.vue";
 import Interaction from "@/components/Interaction.vue";
 
-import { getInteractions } from "../plugins/query";
+import { getInteractions, getExperiment } from "../plugins/utils";
 
 export default {
   components: {
@@ -125,7 +114,10 @@ export default {
             "phenotype",
           ],
         },
-        { label: "gene", options: ["gene", "Ensembl gene ID", "gene region", "gene strand"] },
+        {
+          label: "gene",
+          options: ["gene", "Ensembl gene ID", "gene region", "gene strand"],
+        },
         { label: "target", options: ["target region"] },
         {
           label: "interaction",
@@ -154,7 +146,6 @@ export default {
       page: 1,
       interactions: [],
       total_experiments: 0,
-      experiment: null,
     };
   },
   mounted() {

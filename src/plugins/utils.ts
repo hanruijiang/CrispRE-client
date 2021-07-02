@@ -2,13 +2,51 @@ import axios from "axios";
 
 import experimentsJson from "../jsons/experiments.json";
 
-async function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve("");
-    }, ms);
-  });
-}
+export const getExperiment = (experiment) => {
+  if (experiment) {
+    return Object.keys(experimentsJson).includes(experiment)
+      ? experiment
+      : null;
+  }
+  return null;
+};
+
+export const getRelatedExperiments = (experiment) => {
+  if (!experiment) {
+    return [];
+  }
+  return Object.entries(experimentsJson)
+    .filter(([b, info]) => {
+      return (
+        info.PMID == experimentsJson[experiment].PMID &&
+        info.EXID != experimentsJson[experiment].EXID
+      );
+    })
+    .map(([b, info]) => {
+      return b;
+    });
+};
+
+export const filterExperiments = (filters) => {
+  return Object.entries(experimentsJson)
+    .filter(([b, info]) => {
+      for (const i in filters) {
+        if (filters[i] instanceof Array) {
+          if (!filters[i].includes(info[i])) {
+            return false;
+          }
+        } else {
+          if (filters[i] != info[i]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    })
+    .map(([b, info]) => {
+      return b;
+    });
+};
 
 const parseInteraction = (interaction) => {
   return {
@@ -36,7 +74,6 @@ const parseInteraction = (interaction) => {
 };
 
 export const getTargetInfo = (target) => {
-
   return axios({
     method: "POST",
     headers: { "content-type": "application/json" },

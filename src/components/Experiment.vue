@@ -54,7 +54,7 @@
         :style="
           'width:' +
           (String(experimentsJson[experiment][item.value]).length > 50
-            ? 300
+            ? 304
             : 200) +
           'px'
         "
@@ -85,21 +85,47 @@
       </p>
     </h3>
 
-    <h2
-      style="text-align: left; width: 80%; margin-left: 10%; margin-top: 30px"
-    >
-      {{
-        related_experiments.length > 0
-          ? "Related experiments"
-          : "No related experiments"
-      }}
-    </h2>
-    <el-scrollbar
-      v-if="related_experiments.length > 0"
-      style="width: 80%; margin-left: 10%"
-    >
-      <EXCards :experiments="related_experiments" :warp="false"> </EXCards>
-    </el-scrollbar>
+    <h1>&#10;</h1>
+
+    <div>
+      <router-link
+        v-if="experimentsJson[experiment].N_SIGNIFICANT > 0"
+        :to="'interactions?significant=true&experiment=' + experiment"
+        target="_blank"
+      >
+        <el-button plain type="success" style="margin-right: 25px">
+          <h3>
+            Browse {{ experimentsJson[experiment].N_SIGNIFICANT }} significant
+            interactions
+          </h3>
+        </el-button>
+      </router-link>
+
+      <router-link
+        :to="'interactions?experiment=' + experiment"
+        target="_blank"
+      >
+        <el-button plain type="primary" style="margin-left: 25px">
+          <h3>
+            Browse all {{ experimentsJson[experiment].N_PAIRS }} interactions
+          </h3>
+        </el-button>
+      </router-link>
+    </div>
+
+    <div v-if="related_experiments.length > 0">
+      <h2
+        style="text-align: left; width: 80%; margin-left: 10%; margin-top: 30px"
+      >
+        Related experiments
+      </h2>
+      <el-scrollbar
+        v-if="related_experiments.length > 0"
+        style="width: 80%; margin-left: 10%"
+      >
+        <EXCards :experiments="related_experiments" :warp="false"> </EXCards>
+      </el-scrollbar>
+    </div>
   </el-dialog>
 </template>
 
@@ -108,30 +134,7 @@ import { defineComponent } from "vue";
 import EXCards from "@/components/EXCards.vue";
 import experimentsJson from "../jsons/experiments.json";
 
-const getRelatedExperiments = (experiment) => {
-  if (!experiment) {
-    return [];
-  }
-  return Object.entries(experimentsJson)
-    .filter(([b, info]) => {
-      return (
-        info.PMID == experimentsJson[experiment].PMID &&
-        info.EXID != experimentsJson[experiment].EXID
-      );
-    })
-    .map(([b, info]) => {
-      return b;
-    });
-};
-
-const getExperiment = (experiment) => {
-  if (experiment) {
-    return Object.keys(experimentsJson).includes(experiment)
-      ? experiment
-      : null;
-  }
-  return null;
-};
+import { getExperiment, getRelatedExperiments } from "../plugins/utils";
 
 export default defineComponent({
   components: {

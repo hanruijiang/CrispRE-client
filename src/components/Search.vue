@@ -202,7 +202,9 @@ const getNames = (value) => {
   if (value.length == 0) {
     return [];
   }
-  return value.split(/\s+/).map(i => {return i.trim();});
+  return value.split(/\s+/).map((i) => {
+    return i.trim();
+  });
 };
 
 export default defineComponent({
@@ -293,7 +295,7 @@ export default defineComponent({
         target_region: "",
         target_rsid: "",
         target_encode: "",
-        significant: true,
+        significant: false,
         distance_low: null,
         distance_high: null,
         fc_low: null,
