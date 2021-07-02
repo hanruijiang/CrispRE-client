@@ -1,4 +1,6 @@
-# crispri
+# CrispRE
+
+[http://easybioai.com/CrispRE](http://easybioai.com/CrispRE)
 
 ## Project setup
 ```
