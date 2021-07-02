@@ -23,11 +23,7 @@
     <el-select v-model="gene_filter" clearable>
       <el-option label="genomic region" value="genomic region"></el-option>
       <el-option label="Ensembl gene ID" value="Ensembl gene ID"></el-option>
-      <el-option
-        label="gene name"
-        value="gene name"
-        :disabled="true"
-      ></el-option>
+      <el-option label="gene name" value="gene name"></el-option>
     </el-select>
     <p>&#10;</p>
     <el-form-item
@@ -55,12 +51,12 @@
       ></el-input>
     </el-form-item>
     <el-form-item
-      prop="gene_name"
+      prop="gene_names"
       v-show="gene_filter == 'gene name'"
       style="margin-left: 25px"
     >
       <el-input
-        v-model="form.gene_name"
+        v-model="form.gene_names"
         type="textarea"
         :autosize="{ minRows: 4, maxRows: 10 }"
         placeholder="CCN1&#10;ZNHIT6&#10;SH3GLB1&#10;GBP3"
@@ -159,7 +155,7 @@ const getRegion = (value) => {
   if (!value || value.length == 0) {
     return null;
   }
-  let region = value.replace(",", "").trim().split(/[:-]/);
+  let region = value.replaceAll(",", "").trim().split(/[:-]/);
   if (
     /^chr(([0-9]+)|([A-Z]+))$/.test(region[0]) &&
     /^\d+$/.test(region[1]) &&
@@ -182,7 +178,7 @@ const getENSGs = (value, organism) => {
   if (!value) {
     return [];
   }
-  value = value.replace(/[,;]/, " ").trim();
+  value = value.replaceAll(/[,;]/g, " ").trim();
   if (value.length == 0) {
     return [];
   }
@@ -196,6 +192,17 @@ const getENSGs = (value, organism) => {
     ensgs.push(ensg);
   }
   return ensgs;
+};
+
+const getNames = (value) => {
+  if (!value) {
+    return [];
+  }
+  value = value.replaceAll(/[,;]/g, " ").trim();
+  if (value.length == 0) {
+    return [];
+  }
+  return value.split(/\s+/).map(i => {return i.trim();});
 };
 
 export default defineComponent({
@@ -241,6 +248,22 @@ export default defineComponent({
       return;
     };
 
+    const checkGeneNames = (rule, value: string, callback) => {
+      if (value && this.gene_filter == "gene name") {
+        let names = getNames(value);
+        if (!names) {
+          callback(new Error("please input correct gene name(s)"));
+          return;
+        }
+        if (names.length > 100) {
+          callback(new Error("query < 100 genes at the same time"));
+          return;
+        }
+      }
+      callback();
+      return;
+    };
+
     return {
       // ui
       biosamples: Object.entries(biosamplesJson).map((o) => {
@@ -266,7 +289,7 @@ export default defineComponent({
       form: {
         gene_region: "",
         gene_ensgs: "",
-        gene_name: "",
+        gene_names: "",
         target_region: "",
         target_rsid: "",
         target_encode: "",
@@ -286,6 +309,10 @@ export default defineComponent({
         gene_ensgs: [
           { validator: checkGeneENSGs, trigger: "blur" },
           { validator: checkGeneENSGs, trigger: "clear" },
+        ],
+        gene_names: [
+          { validator: checkGeneNames, trigger: "blur" },
+          { validator: checkGeneNames, trigger: "clear" },
         ],
         targer_region: [
           { validator: checkTargetRegion, trigger: "blur" },
@@ -343,6 +370,16 @@ export default defineComponent({
         }
       }
 
+      delete query["names"];
+      if (this.gene_filter == "gene name") {
+        let gene_names = getNames(this.form.gene_names);
+        if (gene_names && gene_names.length > 0) {
+          this.form.gene_names = gene_names.join("\n");
+          query["names"] = gene_names.join(",");
+          filters["names"] = gene_names;
+        }
+      }
+
       delete query["target_region"];
       if (this.target_filter == "genomic region") {
         let target_region = getRegion(this.form.target_region);
@@ -381,6 +418,10 @@ export default defineComponent({
       if ("genes" in this.$route.query) {
         this.form.gene_ensgs = this.$route.query["genes"].split(",").join("\n");
         this.gene_filter = "Ensembl gene ID";
+      }
+      if ("names" in this.$route.query) {
+        this.form.gene_names = this.$route.query["names"].split(",").join("\n");
+        this.gene_filter = "gene name";
       }
       if ("target_region" in this.$route.query) {
         this.form.target_region = this.$route.query["target_region"];
