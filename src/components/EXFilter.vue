@@ -264,12 +264,5 @@ export default defineComponent({
       }
     },
   },
-  watch: {
-    $route(n, o) {
-      if (n.query["experiment"] != o.query["experiment"]) {
-        this.experiment = getExperiment(this.$route.query["experiment"]);
-      }
-    },
-  },
 });
 </script>

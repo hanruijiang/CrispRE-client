@@ -1,6 +1,22 @@
 <template>
-  <el-table :data="interactions" @rowClick="showDetail">
+  <el-table :data="interactions">
     <el-table-column type="index" :index="currentIndex"></el-table-column>
+
+    <el-table-column align="center" width="24px">
+      <template #default="scope">
+        <router-link
+          :to="
+            'interactions?target=' +
+            scope.row.target.TID +
+            '&experiment=' +
+            scope.row.experiment.EXID +
+            '&gene=' +
+            scope.row.gene.ENSG
+          "
+          ><i class="el-icon-more"></i
+        ></router-link>
+      </template>
+    </el-table-column>
 
     <el-table-column
       label="experiment"
@@ -179,7 +195,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column
+    <!--     <el-table-column
       v-if="columns.includes('related SNPs') && organism == 'Homo sapiens'"
       align="center"
       width="80px"
@@ -229,7 +245,7 @@
           ><i class="el-icon-search"></i
         ></el-link>
       </template>
-    </el-table-column>
+    </el-table-column> -->
   </el-table>
 </template>
 
@@ -248,15 +264,11 @@ export default defineComponent({
   data() {
     return {
       experiments: experimentsJson,
-      detailDisplay: false,
     };
   },
   methods: {
     indexMethod(index) {
       return index + this.currentIndex;
-    },
-    showDetail(row, column, event) {
-      this.detailDisplay = true;
     },
   },
 });

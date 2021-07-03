@@ -49,7 +49,7 @@ export const filterExperiments = (filters) => {
 };
 
 const parseInteraction = (interaction) => {
-  return {
+  const basic = {
     experiment: experimentsJson[interaction[0]],
     gene: {
       ENSG: interaction[1],
@@ -71,6 +71,28 @@ const parseInteraction = (interaction) => {
     q_value: interaction[14],
     significant: interaction[15],
   };
+
+  if (interaction.length >= 19) {
+    const gRNA_sequences = interaction[17].split(";");
+    const gRNA_positions = interaction[18].split(";").map((p) => {
+      if (p.length == 0) {
+        return null;
+      } else {
+        return parseInt(p);
+      }
+    });
+    basic.target["gRNAs"] = Array.from(Array(interaction[16]).keys()).map(
+      (i) => {
+        return {
+          sequence: gRNA_sequences[i],
+          chromosome: interaction[8],
+          position: gRNA_positions[i],
+        };
+      }
+    );
+  }
+
+  return basic;
 };
 
 export const getTargetInfo = (target) => {
@@ -95,5 +117,20 @@ export const getInteractions = (query) => {
     console.log(res.data);
     res.data["interactions"] = res.data.interactions.map(parseInteraction);
     return res.data;
+  });
+};
+
+export const getInteraction = (query) => {
+  console.log(query);
+  return axios({
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    data: query,
+    url: "/api/interaction",
+  }).then((res) => {
+    console.log(res.data);
+    return "interaction" in res.data
+      ? parseInteraction(res.data.interaction)
+      : null;
   });
 };

@@ -46,7 +46,7 @@
       >
       </EXCards>
 
-      <Experiment></Experiment>
+      <Experiment ref="experiment"></Experiment>
     </el-main>
   </el-container>
 </template>
@@ -115,6 +115,7 @@ export default {
     },
   },
   mounted() {
+    this.$refs.experiment.applyFilters(this.$refs.experiment.loadFilters());
     if ("PMID" in this.$route.query) {
       this.search_type == "PubMed ID";
       this.search_text = this.$route.query["PMID"];

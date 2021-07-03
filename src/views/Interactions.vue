@@ -81,7 +81,7 @@
         No interactions were found, please try other options
       </h2>
 
-      <!--       <Interaction></Interaction> -->
+      <Interaction ref="interaction"></Interaction>
     </el-main>
   </el-container>
 </template>
@@ -97,7 +97,7 @@ export default {
   components: {
     Search,
     Result,
-    //     Interaction,
+    Interaction,
   },
   data() {
     return {
@@ -129,7 +129,7 @@ export default {
             "significant",
           ],
         },
-        { label: "external", options: ["related SNPs", "related ccREs"] },
+        //         { label: "external", options: ["related SNPs", "related ccREs"] },
       ],
       columns: [
         "experiment",
@@ -149,6 +149,12 @@ export default {
     };
   },
   mounted() {
+    let filters = this.$refs.interaction.loadFilters();
+    if (filters.experiment != null) {
+      this.$refs.interaction.applyFilters(filters);
+      return;
+    }
+
     this.$refs.search.loadFilters();
     this.$refs.search.applyFilters().then((filters) => {
       if ("page" in this.$route.query) {

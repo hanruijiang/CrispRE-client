@@ -141,12 +141,11 @@ export default defineComponent({
     EXCards,
   },
   data() {
-    let experiment = getExperiment(this.$route.query["experiment"]);
     return {
       display: true,
       experimentsJson: experimentsJson,
-      experiment: experiment,
-      related_experiments: getRelatedExperiments(experiment),
+      experiment: null,
+      related_experiments: [],
       titles: [
         { label: "organism", value: "ORGANISM" },
         { label: "organ", value: "ORGAN" },
@@ -165,20 +164,32 @@ export default defineComponent({
   },
   methods: {
     close() {
-      if (window.history.state.position > 0) {
+      if (
+        window.history.state.position > 0 &&
+        window.history.state.back != null
+      ) {
         this.$router.back();
       } else {
         this.$router.push({
-          path: "experiments",
+          path: "/",
         });
       }
+    },
+    loadFilters() {
+      return getExperiment(this.$route.query["experiment"]);
+    },
+    async applyFilters(experiment) {
+      this.experiment = getExperiment(experiment);
+      this.related_experiments = getRelatedExperiments(this.experiment);
+      return new Promise((r) => {
+        r(this.experiment != null);
+      });
     },
   },
   watch: {
     $route(n, o) {
       if (n.query["experiment"] != o.query["experiment"]) {
-        this.experiment = getExperiment(this.$route.query["experiment"]);
-        this.related_experiments = getRelatedExperiments(this.experiment);
+        this.applyFilters(this.loadFilters());
       }
     },
   },
